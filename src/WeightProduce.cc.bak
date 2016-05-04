@@ -1,0 +1,150 @@
+#include <WeightProduce.hh>
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <string>
+
+#include "TChain.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TString.h"
+#include "TObjString.h"
+#include "TSystem.h"
+#include "TROOT.h"
+
+
+#if not defined(__CINT__) || defined(__MAKECINT__)
+#include "TMVA/Factory.h"
+#include "TMVA/Tools.h"
+#endif
+
+WeightProduce aWeightProduce ;
+WeightProduce::WeightProduce()
+	: Processor("WeightProduce"),
+{
+	_description = "Producing the .xml weight files for tmva";
+	registerProcessorParameter( "TreeOutputFile" ,
+			"",
+			_TMVAFile,
+			_TMVAFile);
+}
+void WeightProduce::TMVAClassification()
+{
+  TMVA::Tools::Instance();
+
+(TMVA::gConfig().GetVariablePlotting()).fMaxNumOfAllowedVariablesForScatterPlots = 20;
+   
+   TString outfileName( "OUTPUTTMVA" );
+   TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
+
+   // Create the factory object. Later you can choose the methods
+   // whose performance you'd like to investigate. The factory is 
+   // the only TMVA object you have to interact with
+   //
+   // The first argument is the base of the name of all the
+   // weightfiles in the directory weight/
+   //
+   // The second argument is the output file for the training results
+   // All TMVA output can be suppressed by removing the "!" (not) in
+   // front of the "Silent" argument in the option string
+//   TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
+ //                                              "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+   TMVA::Factory* factory = new TMVA::Factory("TMVAMulticlass",outputFile,
+		                           "!V:!Silent:Color:!DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=multiclass" );
+   	TFile* filePi = TFile::Open("INPUT");
+	if (!filePi->IsOpen()) std::cout << "could not open file" <<std::endl;
+
+	TTree* treePi = (TTree*)filePi->Get("Pion");
+	if (treePi == 0) std::cout << "could not open tree" <<std::endl;
+
+	TTree* treeMu = (TTree*)fileMu->Get("Muon");
+	if (treeMu == 0) std::cout << "could not open tree" <<std::endl;
+
+	TTree* treeE = (TTree*)fileE->Get("Electron");
+	if (treeE == 0) std::cout << "could not open tree" <<std::endl;
+
+
+   // If you wish to modify default settings
+   // (please check "src/Config.h" to see all available global options)
+   //    (TMVA::gConfig().GetVariablePlotting()).fTimesRMS = 8.0;
+   //    (TMVA::gConfig().GetIONames()).fWeightFileDir = "myWeightDirectory";
+
+   // Define the input variables that shall be used for the MVA training
+   // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
+   // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
+//   TCut mycuts = "NTrk==1 && MCPP[2]/MCPEn<0.7"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+
+
+   factory->AddTree( treePi, TString("Pi"), 1. );
+   factory->AddTree( treeMu, TString("Mu"), 1.);
+//   factory->AddTree( treeE, TString("E"), 1., mycuts);
+   factory->AddTree( treeE, TString("E"), 1.);
+
+
+
+//   factory->AddVariable( "newFD_E","ECAL FD", "", 'F' );
+//   factory->AddVariable( "E2_E := E2/P_rec ",                "E(1R_M)", "units", 'F' );
+//   factory->AddVariable( "E0_E := E0/P_rec ",                "E(1.5 R_M)", "units", 'F' );
+//   factory->AddVariable( "E_10 := ecalEn1/P_rec ",                "E_10Lay", "units", 'F' );
+//   factory->AddVariable( "EDep",                "EDEP", "units", 'F' );
+
+	factory->AddVariable("EcalNHit","EcalNHit", "units", 'I');
+	factory->AddVariable("HcalNHit","HcalNHit", "units", 'I');
+	factory->AddVariable("NLEcal","NLEcal", "units", 'I');
+	factory->AddVariable("NLHcal","NLHcal", "units", 'I');
+	factory->AddVariable("maxDisHtoL","maxDisHtoL", "units", 'F');
+	factory->AddVariable("avDisHtoL","avDisHtoL", "units", 'F');
+	factory->AddVariable("EE := EcalEn/EClu","EcalEn", "units", 'F');
+	factory->AddVariable("graDepth","graDepth", "units", 'F');
+	factory->AddVariable("cluDepth","cluDepth", "units", 'F');
+	factory->AddVariable("minDepth","minDepth", "units", 'F');
+	factory->AddVariable("MaxDisHel","MaxDisHel", "units", 'F');
+	factory->AddVariable("FD_all","FD_all", "units", 'F');
+	factory->AddVariable("FD_ECAL","FD_ECAL", "units", 'F');
+	factory->AddVariable("FD_HCAL","FD_HCAL", "units", 'F');
+	factory->AddVariable("E_10 := EEClu_L10/EcalEn","EEClu_L10", "units", 'F');
+	factory->AddVariable("E_R := EEClu_R/EcalEn","EEClu_R", "units", 'F');
+	factory->AddVariable("E_r := EEClu_r/EcalEn","EEClu_r", "units", 'F');
+	factory->AddVariable("rms_Hcal","rms_Hcal", "units", 'F');
+	factory->AddVariable("rms_Hcal2","rms_Hcal2", "units", 'F');
+	factory->AddVariable("av_NHH","av_NHH", "units", 'F');
+	factory->AddVariable("AL_Ecal","AL_Ecal", "units", 'I');
+	factory->AddVariable("FD_ECALF10","FD_ECALF10", "units", 'F');
+	factory->AddVariable("FD_ECALL20","FD_ECALL20", "units", 'F');
+	factory->AddVariable("NH_ECALF10","NH_ECALF10", "units", 'I');
+	factory->AddVariable("dEdx","dEdx", "units", 'F');
+	  
+  
+   std::cout << "--- TMVAClassification       : Using input file: " << std::endl;
+   
+   // --- Register the training and test trees
+
+   
+   // global event weights per tree (see below for setting event-wise weights)
+   Double_t signalWeight     = 1.0;
+   Double_t backgroundWeight = 1.0;
+     factory->PrepareTrainingAndTestTree( "", "SplitMode=Random:NormMode=NumEvents:!V" );
+     // Boosted Decision Trees
+      factory->BookMethod( TMVA::Types::kBDT, "BDTG",
+			"!H:!V:NTrees=1000:BoostType=Grad:Shrinkage=0.10:UseBaggedGrad:GradBaggingFraction=0.50:nCuts=20:NNodesMax=8" );
+        factory->TrainAllMethods();
+
+   // ---- Evaluate all MVAs using the set of test events
+   factory->TestAllMethods();
+
+   // ----- Evaluate and compare performance of all configured MVAs
+   factory->EvaluateAllMethods();
+
+   // --------------------------------------------------------------
+
+   // Save the output
+   outputFile->Close();
+
+   std::cout << "==> Wrote root file: " << outputFile->GetName() << std::endl;
+   std::cout << "==> TMVAClassification is done!" << std::endl;
+
+   delete factory;
+
+   // Launch the GUI for the root macros
+//   if (!gROOT->IsBatch()) TMVAGui( outfileName );
+}
