@@ -36,7 +36,7 @@ trainingF=0
 inputPFO=ArborPFOs
 
 ##the path of weight file
-WEIGHTDIR=$path
+WEIGHTDIR=TMVA
 
 mkdir -p $SimuWorkDir/$OUTPUTDATA/
 
@@ -47,11 +47,11 @@ sed -i "s#INPUTLCIO_E#$InputFiles_slcio_e#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
 sed -i "s#INPUTLCIO_MU#$InputFiles_slcio_mu#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
 sed -i "s#GEARFILE#$GEARFILE#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
 sed -i "s#OUTPUTLCIO#$OUTPUT_slcio#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
-sed -i "s#OUTPUT#$OUTPUT_root#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
+sed -i "s#OUTPUTROOT#$OUTPUT_root#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
 sed -i "s#TRAININGEN#$energy#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
 sed -i "s#TRAININGFLAG#$trainingF#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
 sed -i "s#INPUTPFO#$inputPFO#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
-sed -i "s#WEIGHTDIR#$WEIGHTDIR#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
+sed -i "s#WGTFILE#$WEIGHTDIR#g" $SimuWorkDir/$OUTPUTDATA/pid.xml
 
 echo \
 "#! /bin/bash

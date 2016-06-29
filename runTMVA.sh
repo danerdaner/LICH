@@ -13,14 +13,14 @@ do
 export SimuWorkDir=$path
 
 energy=${ens[$ien]}
-INPUT="$SimuWorkDir/tmp_${energy}GeV/output.root_${energy}.root"
+INPUT="$SimuWorkDir/tmp_${energy}GeV/PID_${energy}GeV.root"
 
 ipos=0
 while [ "$ipos" -lt "5" ]
 do
 
 POS=${pos[$ipos]}
-OUTPUTDATA="TMVA_${energy}GeV_$POS"
+OUTPUTDATA="TMVA"
 mkdir -p $SimuWorkDir/$OUTPUTDATA
 OUTPUTTMVA="TMVA_${energy}GeV_$POS.root"
 TMVAMulticlassEN="TMVAMulticlass_${energy}GeV_$POS"

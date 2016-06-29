@@ -11,15 +11,15 @@
  <marlin>
    
    <execute>
-     <processor name="MyTrainingSample"/>
-     <processor name="MyLCIOOutputProcessor"/>
+     <processor name="MyLICH"/>
+     <!--processor name="MyLCIOOutputProcessor"/-->
      </execute>
 
      <global>
      <parameter name="LCIOInputFiles">
-     	INPUTLCIO_PI
-     	INPUTLCIO_E
-     	INPUTLCIO_MU
+      	INPUTLCIOPI
+     	INPUTLCIOMU
+     	INPUTLCIOE
      </parameter>
      <parameter name="GearXMLFile" value="GEARFILE"/>
      <parameter name="MaxRecordNumber" value="-1"/>
@@ -29,27 +29,27 @@
      <parameter name="RandomSeed" value="1234567890" />
      </global>
 
- <processor name="MyTrainingSample" type="TrainingSample">
+ <processor name="MyLICH" type="LICH">
  <!--Produce single particle samples for training or produce the charged PID-->
   <!--DetectorModules-->
   <parameter name="InputDetectorModules" type="StringVec">barrel1 barrel2 overlap endcap  </parameter>
   <!--The interval of energy for PID-->
-  <parameter name="InputEnergyPoints" type="IntVec"> 1 2 3 5 7 10 20 30 40 50 70 </parameter>
   <!--Name of Inpout MC Particle Collection-->
   <parameter name="InputMCParticle" type="string">MCParticle </parameter>
   <!--Name of Inpout Reconstructed Particle Collection-->
-  <parameter name="InputPFO" type="string">INPUTPFO </parameter>
+  <parameter name="InputPFO" type="string">ArborPFOs </parameter>
   <!--The interval of angle for PID-->
   <parameter name="InputPositions" type="FloatVec">0 0.3 0.55 0.75 1  </parameter>
   <!--Name of Output Reconstructed Particle Collection-->
   <parameter name="OutputPFO" type="string">typedPFOs </parameter>
   <!--The generated energy point choson for training-->
-  <parameter name="TrainingEn" type="string">TRAININGEN </parameter>
   <!--Produce sample for training when 0, otherwise proceed the PID-->
-  <parameter name="TrainingFlag" type="int">TRAININGFLAG </parameter>
+  <parameter name="TrainingFlag" type="int">0 </parameter>
   <!--The name of the file to which the pion ROOT tree will be written-->
-  <parameter name="TreeOutputFile" type="string">OUTPUT </parameter>
+  <parameter name="TreeOutputFile" type="string">OUTPUTROOT </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
+  <parameter name="TrainingEn" type="string">TRAININGEN </parameter>
+  <parameter name="weightDir" type="string">WGTFILE </parameter>
   <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
   <!--mva value cut for electron-->
   <parameter name="mvacut_e" type="float">0.5 </parameter>
@@ -58,7 +58,6 @@
   <!--mva value cut for electron-->
   <parameter name="mvacut_pi" type="float">0.5 </parameter>
   <!--the weight file directory-->
-  <parameter name="weightDir" type="string"> WEIGHTDIR</parameter>
 </processor>
 
      <processor name="MyLCIOOutputProcessor" type="LCIOOutputProcessor">
