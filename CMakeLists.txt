@@ -38,9 +38,9 @@ ADD_DEFINITIONS( ${MarlinUtil_DEFINITIONS} )
 # LINK_LIBRARIES( ${MarlinTrk_LIBRARIES} )
 # ADD_DEFINITIONS( ${MarlinTrk_DEFINITIONS} )
 
-FIND_PACKAGE( ROOT REQUIRED ) 
+FIND_PACKAGE( ROOT REQUIRED COMPONENTS TMVA )
 INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIRS} )
-LINK_LIBRARIES( ${ROOT_LIBRARIES} )
+LINK_LIBRARIES( ${ROOT_LIBRARIES} ${ROOT_COMPONENT_LIBRARIES} )
 ADD_DEFINITIONS( ${ROOT_DEFINITIONS} )
 
 # FIND_PACKAGE( GSL REQUIRED ) 
@@ -76,8 +76,8 @@ ENDIF()
 # definitions to pass to the compiler
 #ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
 # -pendatic: does not allow variable array size
-ADD_DEFINITIONS( "-Wall -ansi" )
-ADD_DEFINITIONS( "-Wno-long-long" )
+#ADD_DEFINITIONS( "-Wall -ansi" )
+#ADD_DEFINITIONS( "-Wno-long-long" )
 
 # include directories
 INCLUDE_DIRECTORIES( ./include )
