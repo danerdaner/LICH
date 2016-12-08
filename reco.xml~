@@ -39,7 +39,7 @@
   <!--Name of Inpout Reconstructed Particle Collection-->
   <parameter name="InputPFO" type="string">ArborPFOs </parameter>
   <!--The interval of angle for PID-->
-  <parameter name="InputPositions" type="FloatVec">0 0.3 0.6 0.8 1  </parameter>
+  <parameter name="InputPositions" type="FloatVec">0 0.3 0.55 0.75 1  </parameter>
   <!--Name of Output Reconstructed Particle Collection-->
   <parameter name="OutputPFO" type="string">typedPFOs </parameter>
   <!--The generated energy point choson for training-->

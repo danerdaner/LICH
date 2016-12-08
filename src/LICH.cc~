@@ -93,14 +93,14 @@ LICH::LICH()
 			_Training);
 
 	int en[]={1,2,3,5,7,10,20,30,40,50,70};
-	float ang[]={0.0,0.3,0.7,0.8,1.0};
+	float ang[]={0.0,0.3,0.55,0.75,1.0};
 	NEn=sizeof(en)/sizeof(int);
 	NPos=sizeof(ang)/sizeof(int);
 	for(int i=0;i<NEn;i++){
 		inputEn.push_back(en[i]);
 	}
 	for(int i=0;i<NPos;i++){
-		inputsubPos.push_back(ang[i]);
+		inputPos.push_back(ang[i]);
 	}
 
 	registerProcessorParameter("InputEnergyPoints",
@@ -111,8 +111,8 @@ LICH::LICH()
  
 	registerProcessorParameter("InputPositions",
 			"The interval of angle for PID",
-			inputsubPos,
-			inputsubPos);
+			inputPos,
+			inputPos);
   
  
 	inputDetectorModules.push_back("barrel1");
@@ -124,17 +124,9 @@ LICH::LICH()
 			inputDetectorModules,
 			inputDetectorModules);
 
-	en_bin.push_back(-1);
-	registerProcessorParameter("EnergyBins",
-			"energy bins to make cut different",
-			en_bin,
-			en_bin);
-	NEnBin=en_bin.size();
-	for(int i=0;i<NEnBin;i++){
-		mvacut_e.push_back(0.5);
-		mvacut_mu.push_back(0.5);
-		mvacut_pi.push_back(0.5);
-	}
+	mvacut_e=0.5;
+	mvacut_mu=0.5;
+	mvacut_pi=0.5;
 	
 	registerProcessorParameter("mvacut_e",
 			"mva value cut for electron",
@@ -153,7 +145,6 @@ LICH::LICH()
 			"the weight file directory",
 			weightDir,
 			weightDir);
-	Num=0;
 
 }
 
@@ -386,7 +377,6 @@ void LICH::init() {
 
 	piTree->Branch("EventNr", &eventNr, "EventNr/I");
 	piTree->Branch("MCPDG", &MCPDG, "MCPDG/I");
-	piTree->Branch("NMCP", &NMCP, "NMCP/I");
 	piTree->Branch("ClusterID", &ClusterID, "ClusterID/I");
 	piTree->Branch("NPFO", &NPFO, "NPFO/I");
 	piTree->Branch("EcalNHit",&EcalNHit,"EcalNHit/I");
@@ -436,7 +426,6 @@ void LICH::init() {
 
 	muTree->Branch("EventNr", &eventNr, "EventNr/I");
 	muTree->Branch("MCPDG", &MCPDG, "MCPDG/I");
-	muTree->Branch("NMCP", &NMCP, "NMCP/I");
 	muTree->Branch("ClusterID", &ClusterID, "ClusterID/I");
 	muTree->Branch("NPFO", &NPFO, "NPFO/I");
 	muTree->Branch("EcalNHit",&EcalNHit,"EcalNHit/I");
@@ -486,7 +475,6 @@ void LICH::init() {
 
 	eTree->Branch("EventNr", &eventNr, "EventNr/I");
 	eTree->Branch("MCPDG", &MCPDG, "MCPDG/I");
-	eTree->Branch("NMCP", &NMCP, "NMCP/I");
 	eTree->Branch("ClusterID", &ClusterID, "ClusterID/I");
 	eTree->Branch("NPFO", &NPFO, "NPFO/I");
 	eTree->Branch("EcalNHit",&EcalNHit,"EcalNHit/I");
@@ -583,52 +571,6 @@ void LICH::init() {
 	otherTree->Branch("Phi",&Phi,"Phi/F");
 
 	
-	evtTree = new TTree("Evt","Evt");
-	evtTree->Branch("EventNr", &eventNr, "EventNr/I");
-	evtTree->Branch("NPFO", &NPFO, "NPFO/I");
-	evtTree->Branch("minAngle", &minAngle, "minAngle/F");
-	evtTree->Branch("minEn", &minEn, "minEn/F");
-	evtTree->Branch("LCEn", &LCEn, "LCEn/F");
-	evtTree->Branch("LCID", &LCID, "LCID/I");
-	evtTree->Branch("TotalEn", &TotalEn, "TotalEn/F");
-	evtTree->Branch("FPFO", &FPFO, "FPFO/I");
-	evtTree->Branch("FMu", &FMu, "FMu/I");
-	evtTree->Branch("FE", &FE, "FE/I");
-	evtTree->Branch("MCPDG", &MCPDG, "MCPDG/I");
-	evtTree->Branch("NMuon", &NMuon, "NMuon/I");
-	evtTree->Branch("NElectron", &NElectron, "NElectron/I");
-	evtTree->Branch("IniMu",&IniMu,"IniMu/I");
-	evtTree->Branch("IniE",&IniE,"IniE/I");
-	evtTree->Branch("mva_e", &mva_e, "mva_e/F");
-	evtTree->Branch("mva_mu", &mva_mu, "mva_mu/F");
-	evtTree->Branch("mva_pi", &mva_pi, "mva_pi/F");
-	evtTree->Branch("LCcosTheta",&LCcosTheta,"LCcosTheta/F");
-	//evtTree->Branch("NPion", &NPion, "NPion/I");
-	//evtTree->Branch("NElec", &NElec, "NElec/I");
-	//evtTree->Branch("", &, "");
-	//evtTree->Branch("", &, "");
-	//evtTree->Branch("", &, "");
-	
-	ArborPFO = new TTree("ArborPFO","ArborPFO");
-	ArborPFO->Branch("EventNr", &eventNr, "EventNr/I");
-	ArborPFO->Branch("Num", &Num, "Num/I");
-	ArborPFO->Branch("RecoEn", &RecoEn, "RecoEn/F");
-	ArborPFO->Branch("LinkMCEn", &LinkMCEn, "LinkMCEn/F");
-	ArborPFO->Branch("ImpactPara", &ImpactPara, "ImpactPara/F");
-	ArborPFO->Branch("trkD0", &trkD0, "trkD0/F");
-	ArborPFO->Branch("sigD0", &sigD0, "sigD0/F");
-	ArborPFO->Branch("trkZ0", &trkZ0, "trkZ0/F");
-	ArborPFO->Branch("sigZ0", &sigZ0, "sigZ0/F");
-	ArborPFO->Branch("PFOID", &PFOID, "PFOID/I");
-	ArborPFO->Branch("MCID", &MCID, "MCID/I");
-	ArborPFO->Branch("MCMotherID", &MCMotherID, "MCMotherID/I");
-	ArborPFO->Branch("muMotherID", &muMotherID, "muMotherID/I");
-	ArborPFO->Branch("PFOcosTheta", &PFOcosTheta, "PFOcosTheta/F");
-	ArborPFO->Branch("closedPar", &closedPar, "closedPar/F");
-	ArborPFO->Branch("closedMCP", &closedMCP, "closedMCP/F");
-	ArborPFO->Branch("ELike", &ELike, "ELike/F");
-	ArborPFO->Branch("MuLike", &MuLike, "MuLike/F");
-	ArborPFO->Branch("PiLike", &PiLike, "PiLike/F");
 
 	if(_Training==0)
 	{
@@ -644,9 +586,7 @@ void LICH::init() {
 				TString spos=inputDetectorModules[j].c_str();
 		   		TString fwgtFname = weightDir + "/weights/TMVAMulticlass_"+slevel+"GeV_"+spos+"_BDTG.weights.xml";
 				if(!access(fwgtFname,0)){
-				//	wgtFname= weightDir + "/weights/TMVAMulticlass_"+slevel+"GeV_"+spos+"_BDTG.weights.xml";
-					
-					wgtFname=weightDir + "/weights/TMVAMulticlass_"+slevel+"GeV_all_BDTG.weights.xml";
+					wgtFname= weightDir + "/weights/TMVAMulticlass_"+slevel+"GeV_"+spos+"_BDTG.weights.xml";
 				}
 				else{
 					wgtFname=weightDir + "/weights/TMVAMulticlass_"+slevel+"GeV_all_BDTG.weights.xml";
@@ -682,7 +622,7 @@ void LICH::init() {
 				E_r=EEClu_r/EcalEn;
 				E_10=EEClu_L10/EcalEn;
 				EE=EcalEn/EClu;
-		   		reader->BookMVA("BDTG", wgtFname);
+		   			reader->BookMVA("BDTG", wgtFname);
 				reader1.push_back(reader);
 			}
 			reader_all.push_back(reader1);
@@ -809,7 +749,6 @@ void LICH::NewClusterFlag(Cluster* a_tree, Track* a_trk)
 		if(a_tree){
 		TVector3 CluPos;
 		CluPos = a_tree->getPosition();
-		cosTheta=0.;
 		cosTheta=CluPos[2]/CluPos.Mag();
 		Phi=atan2(CluPos[1],CluPos[0]);
                 TVector3 IntDir = ClusterCoG(a_tree)-CluPos;
@@ -1203,7 +1142,7 @@ void LICH::NewClusterFlag(Cluster* a_tree, Track* a_trk)
 				if(TrackEn>inputLevel[i]&&TrackEn<inputLevel[i+1]){
 					reader_1=reader_all[i];
 					for(int j=0;j<NPos-1;j++){
-						if(abs(cosTheta)>inputsubPos[j]&&abs(cosTheta)<inputsubPos[j+1]){
+						if(abs(cosTheta)>inputPos[j]&&abs(cosTheta)<inputPos[j+1]){
 							reader=reader_1[j];
 						}
 						else{
@@ -1221,33 +1160,14 @@ void LICH::NewClusterFlag(Cluster* a_tree, Track* a_trk)
    			mvaVal_mu = (reader->EvaluateMulticlass("BDTG"))[1];
    			mvaVal_e = (reader->EvaluateMulticlass("BDTG"))[2];
 			cout<<"e:mu:pi "<<mvaVal_e<<" "<<mvaVal_mu<<" "<<mvaVal_pi<<endl;
-			ClusterID=0;
-			int Nenbin=en_bin.size();
-
-			for(int i=0;i<Nenbin-1;i++){
-				if(TrackEn>en_bin[i]&&TrackEn<en_bin[i+1]){
-					if(mvaVal_e>mvacut_e[i]&&mvaVal_mu<mvacut_mu[i]&&mvaVal_pi<mvacut_pi[i]){
-						ClusterID = -11;
-					}
-					if(mvaVal_pi>mvacut_pi[i]&&mvaVal_mu<mvacut_mu[i]&&mvaVal_e<mvacut_e[i]){
-						ClusterID = 211;
-					}
-					if(mvaVal_mu>mvacut_mu[i]&&mvaVal_pi<mvacut_pi[i]&&mvaVal_e<mvacut_e[i]){
-						ClusterID = -13;
-					}
-				}
+			if(mvaVal_e>mvacut_e&&mvaVal_mu<mvacut_mu&&mvaVal_pi<mvacut_pi){
+				ClusterID = -11;
 			}
-			if(TrackEn>en_bin[Nenbin-1]){
-
-					if(mvaVal_e>mvacut_e[Nenbin-1]&&mvaVal_mu<mvacut_mu[Nenbin-1]&&mvaVal_pi<mvacut_pi[Nenbin-1]){
-						ClusterID = -11;
-					}
-					if(mvaVal_pi>mvacut_pi[Nenbin-1]&&mvaVal_mu<mvacut_mu[Nenbin-1]&&mvaVal_e<mvacut_e[Nenbin-1]){
-						ClusterID = 211;
-					}
-					if(mvaVal_mu>mvacut_mu[Nenbin-1]&&mvaVal_pi<mvacut_pi[Nenbin-1]&&mvaVal_e<mvacut_e[Nenbin-1]){
-						ClusterID = -13;
-					}
+			if(mvaVal_pi>mvacut_pi&&mvaVal_mu<mvacut_mu&&mvaVal_e<mvacut_e){
+				ClusterID = 211;
+			}
+			if(mvaVal_mu>mvacut_mu&&mvaVal_pi<mvacut_pi&&mvaVal_e<mvacut_e){
+				ClusterID = -13;
 			}
 		}	
 	}
@@ -1259,14 +1179,6 @@ void LICH::SamplePro( LCEvent * evtP )
 	{
 		eventNr=evtP->getEventNumber();
 		MCPDG=0;
-		FPFO=0;
-		FMu=0;
-		FE=0;
-		IniMu=0;
-		IniE=0;
-
-		minAngle=999;	
-		
 		
 		try{
 			LCCollection * MCP = evtP->getCollection(_inputMCP.c_str());
@@ -1278,68 +1190,17 @@ void LICH::SamplePro( LCEvent * evtP )
 					MCPDG=a_MCP->getPDG();
 				}
 			}
-
-			for(int i = 0; i < MCP->getNumberOfElements(); i++)
-			{
-				MCParticle * a_MCP = dynamic_cast<MCParticle*>(MCP->getElementAt(i));
-				TVector3 VtxPos = a_MCP->getVertex();
-				TVector3 EndPPos = a_MCP->getEndpoint();
-				int _PIDMCP=a_MCP->getPDG();
-
-				
-				if( VtxPos.Perp() < 200 && fabs(VtxPos.Z()) < 2350 && (EndPPos.Perp() > 1800 || fabs(EndPPos.Z()) > 2350 )  && fabs(_PIDMCP) != 12 &&  fabs(_PIDMCP) != 14 &&  fabs(_PIDMCP) != 16 )
-					
-				//if( a_MCP->getDaughters().size() == 0 )
-				{
-					FPFO++;
-					if(abs(_PIDMCP)==13)FMu++;
-					if(abs(_PIDMCP)==11)FE++;
-				}
-			}
-			for(int i = 0; i < MCP->getNumberOfElements(); i++)
-			{
-				MCParticle * a_MCP = dynamic_cast<MCParticle*>(MCP->getElementAt(i));
-				TVector3 VtxPos = a_MCP->getVertex();
-				TVector3 EndPPos = a_MCP->getEndpoint();
-				int _PIDMCP=a_MCP->getPDG();
-				float muonEn=a_MCP->getEnergy();
-				float muonAngle = abs(a_MCP->getMomentum()[2]/a_MCP->getEnergy());
-				if(VtxPos.Perp() < 200 && fabs(VtxPos.Z()) < 2350 && (EndPPos.Perp() > 1800 || fabs(EndPPos.Z()) > 2350 ) && abs(_PIDMCP)==13  && muonAngle<minAngle)
-						{
-							minAngle=muonAngle;
-							minEn=muonEn;
-						}
-			}
 			LCCollection * RecoCol=evtP->getCollection(_inputPFO.c_str());
 			NPFO=RecoCol->getNumberOfElements();
 
-
-			if(FPFO>0&&_Training==1&&NPFO>0){
-				LCEn=0;
-				TotalEn=0;
-				int LCIndex=0;
-				for(int i=0;i<NPFO;i++){
-
-					ReconstructedParticle * b_pfo=dynamic_cast<ReconstructedParticle*>(RecoCol->getElementAt(i));
-					
-					TotalEn+=b_pfo->getEnergy();
-					if(b_pfo->getCharge()==0)continue;
-					if(b_pfo->getEnergy()>LCEn){
-						LCEn=b_pfo->getEnergy();
-						LCIndex=i;
-					}
-					
-				}
-				ReconstructedParticle * a_pfo=dynamic_cast<ReconstructedParticle*>(RecoCol->getElementAt(LCIndex));
+			if(NPFO==1&&_Training==1){
+				ReconstructedParticle * a_pfo=dynamic_cast<ReconstructedParticle*>(RecoCol->getElementAt(0));
 				Track * a_trk(0);
 				if(a_pfo->getTracks().size())a_trk= a_pfo->getTracks()[0];
 
 				Cluster * a_clu(0);
 				if(a_pfo->getClusters().size())a_clu= a_pfo->getClusters()[0];
-				if(a_pfo->getCharge()!=0){
-					NewClusterFlag(a_clu,a_trk);
-				}
-				//if(LCEn/TotalEn>0.9||TotalEn<1e-4){
+				if(a_pfo->getCharge()>0)NewClusterFlag(a_clu,a_trk);
 				if(abs(MCPDG)==211){
 					piTree->Fill();
 				}
@@ -1352,184 +1213,56 @@ void LICH::SamplePro( LCEvent * evtP )
 				else{
 					otherTree->Fill();
 				}
-				evtTree->Fill();
-				//}
 
 			}
 
 			if(_Training==0){
 				LCCollection *arborrecoparticle = new LCCollectionVec(LCIO::RECONSTRUCTEDPARTICLE);
 				LCCollection * newMCP = evtP->getCollection("MCParticle");
-
-				LCCollection *TrkMCLink = evtP->getCollection("RecoMCTruthLink");
-				int NLink = TrkMCLink->getNumberOfElements();
-
-
-
 				try{
-					LCCollection * Trks = evtP->getCollection("ClupatraTracks");
-					if(Trks->getNumberOfElements()>0){
-						Track * a_cluTrk=dynamic_cast<Track*>(Trks->getElementAt(0));
-						Cluster *a_empClu(0);
-						if(NPFO==0){
+				LCCollection * Trks = evtP->getCollection("ClupatraTracks");
+				if(Trks->getNumberOfElements()>0){
+				Track * a_cluTrk=dynamic_cast<Track*>(Trks->getElementAt(0));
+				Cluster *a_empClu(0);
+				if(NPFO==0){
 
-							NewClusterFlag(a_empClu,a_cluTrk);
-							otherTree->Fill();
-						}
-					}
+					NewClusterFlag(a_empClu,a_cluTrk);
+					otherTree->Fill();
+				}
+				}
 				}catch(lcio::DataNotAvailableException err){}
-
-				if(newMCP->getNumberOfElements()!=0){
 				MCParticle * a_MCP = dynamic_cast<MCParticle*>(newMCP->getElementAt(0));
 				TVector3 Mom=a_MCP->getMomentum();
 				TrkEn=Mom.Mag();
-				NMuon=0;
-				NElectron=0;
-				TotalEn=0;
-				LCEn=0.;
-				cout<<eventNr<<"event have "<<NPFO<<" PFOs"<<endl;
-				mva_e=-1.;
-				mva_mu=-1.;
-				mva_pi=-1.;
-				float maxEnergy=0.;
-				ImpactPara=0;
 				for(int i=0;i<NPFO;i++){
 
 					ReconstructedParticleImpl * chargeparticle = new ReconstructedParticleImpl();
 					ReconstructedParticle * b_pfo=dynamic_cast<ReconstructedParticle*>(RecoCol->getElementAt(i));
-				
-					
-					TotalEn+=b_pfo->getEnergy();
+					ParticleIDImpl * pid=new ParticleIDImpl();
 					Track * a_trk(0);
-					if(b_pfo->getTracks().size()){
-						a_trk=b_pfo->getTracks()[0];
-						float trkD0=a_trk->getD0();
-						float trkZ0=a_trk->getZ0();
-						float sigD0=sqrt(a_trk->getCovMatrix()[0]);
-						float sigZ0=sqrt(a_trk->getCovMatrix()[9]);
-
-						ImpactPara=sqrt(trkD0*trkD0/(sigD0*sigD0)+trkZ0*trkZ0/(sigZ0*sigZ0));
-					}
+					if(b_pfo->getTracks().size())a_trk=b_pfo->getTracks()[0];
 					Cluster * a_clu(0);
-					
 					if(b_pfo->getClusters().size())a_clu= b_pfo->getClusters()[0];
-					for(int ic=0;ic<b_pfo->getClusters().size();ic++){
-						chargeparticle->addCluster(b_pfo->getClusters()[ic]);
-					}
 					if(b_pfo->getCharge()!=0){
-						ParticleIDImpl * pid_e=new ParticleIDImpl();
-						ParticleIDImpl * pid_mu=new ParticleIDImpl();
-						ParticleIDImpl * pid_pi=new ParticleIDImpl();
-					
 						chargeparticle->addParticle(b_pfo);
 						chargeparticle->setEnergy(b_pfo->getEnergy());
 						chargeparticle->addTrack(b_pfo->getTracks()[0]);
 						chargeparticle->setMomentum(b_pfo->getMomentum() );
 						chargeparticle->setCharge(b_pfo->getCharge());
-						chargeparticle->setCovMatrix(b_pfo->getCovMatrix());
-
-						MCMotherID=0;
-						MCID = 0;
-						closedMCP=999.;
-						for(int pp = 0; pp < NLink; pp++)
-						{
-							LCRelation *a_link = dynamic_cast<LCRelation*>(TrkMCLink->getElementAt(pp));
-							if(a_link->getFrom() == b_pfo)
-							{
-								MCParticle * b_MCP = dynamic_cast<MCParticle*>(a_link->getTo());
-								LinkMCEn=b_MCP->getEnergy();
-								for(int tt=0;tt< MCP->getNumberOfElements();tt++){
-									MCParticle * c_MCP = dynamic_cast<MCParticle*>(MCP->getElementAt(tt));
-									TVector3 Mom_b=b_MCP->getMomentum();
-									TVector3 Mom_c=c_MCP->getMomentum();
-									TVector3 VtxPos = c_MCP->getVertex();
-									TVector3 EndPPos = c_MCP->getEndpoint();
-	
-									if(VtxPos.Perp() < 200 && fabs(VtxPos.Z()) < 2350 && (EndPPos.Perp() > 1800 || fabs(EndPPos.Z()) > 2350 ) &&  c_MCP->getEnergy()> 0.1 ){
-										if(Mom_c.Angle(Mom_b)<closedMCP&&Mom_c.Angle(Mom_b)>1e-10){
-											closedMCP=Mom_c.Angle(Mom_b);
-										}
-									}
-								}
-								
-								
-								MCParticle * a_par=b_MCP;
-								do{
-									a_par=a_par->getParents()[0];
-								}while(a_par->getParents().size()>0&&abs(a_par->getPDG())!=25);
-								MCMotherID=a_par->getPDG();	
-								if(abs(MCMotherID)==13){
-									IniMu++;
-								}
-								if(abs(MCMotherID)==11){
-									IniE++;
-								}
-								MCID = b_MCP->getPDG(); 
-								break; 
-							}
-						}
-						closedPar=999.;
-						for(int qq=0;qq<NPFO;qq++){
-							ReconstructedParticle * c_pfo=dynamic_cast<ReconstructedParticle*>(RecoCol->getElementAt(qq));
-							TVector3 c_mom=c_pfo->getMomentum();
-							TVector3 b_mom=b_pfo->getMomentum();
-							if(c_mom.Angle(b_mom)<closedPar&&c_mom.Angle(b_mom)>1e-10){
-								closedPar=c_mom.Angle(b_mom);
-							}
-						}
-
-
+						chargeparticle->addCluster(b_pfo->getClusters()[0]);
 						NewClusterFlag(a_clu,a_trk);
-						ELike=mvaVal_e;
-						MuLike=mvaVal_mu;
-						PiLike=mvaVal_pi;
-						PFOcosTheta=cosTheta;
-						RecoEn=b_pfo->getEnergy();
-						
-						if(b_pfo->getEnergy()>maxEnergy){
-							maxEnergy=b_pfo->getEnergy();
-							LCcosTheta=cosTheta;
-							mva_e=mvaVal_e;
-							mva_mu=mvaVal_mu;
-							mva_pi=mvaVal_pi;
-							LCID=ClusterID;
-						}
-						LCEn=maxEnergy;
-
-
-
 						otherTree->Fill();
-						ArborPFO->Fill();
-						if(abs(ClusterID)==13&&abs(MCMotherID)==13){NMuon++;}
-						if(abs(ClusterID)==11&&abs(MCMotherID)==11){NElectron++;}
-						pid_e->setPDG(int(11*b_pfo->getCharge()));
-						pid_mu->setPDG(int(13*b_pfo->getCharge()));
-						pid_pi->setPDG(int(-211*b_pfo->getCharge()));
-						pid_e->setLikelihood(ELike);
-						pid_mu->setLikelihood(MuLike);
-						pid_pi->setLikelihood(PiLike);
+						pid->setPDG(int(ClusterID*b_pfo->getCharge()));
 						chargeparticle->setType(int(ClusterID*b_pfo->getCharge()));
-						chargeparticle->addParticleID(pid_e);
-						chargeparticle->addParticleID(pid_mu);
-						chargeparticle->addParticleID(pid_pi);
+						chargeparticle->addParticleID(pid);
 						arborrecoparticle->addElement(chargeparticle);
-						cout<<"test pid"<<chargeparticle->getParticleIDs()[0]->getPDG()<<endl;
 					}
 					else{
 						chargeparticle->addParticle(b_pfo);
-						chargeparticle->setEnergy(b_pfo->getEnergy());
-						chargeparticle->setMomentum(b_pfo->getMomentum() );
-						chargeparticle->setCharge(b_pfo->getCharge());
-						chargeparticle->setCovMatrix(b_pfo->getCovMatrix());
-						chargeparticle->setType(b_pfo->getType());
 						arborrecoparticle->addElement(chargeparticle);
 					}
 				}
-				}
-				Num++;
-				evtTree->Fill();
 				evtP->addCollection( arborrecoparticle, _outputPFO.c_str());
-
 
 			}
 		}catch(lcio::DataNotAvailableException err){}
@@ -1544,15 +1277,14 @@ void LICH::processEvent( LCEvent * evtP )
 	{
 		int eventNr = evtP->getEventNumber();
 
-		//if(eventNr%1 == 0)
+		if(eventNr%1 == 0)
 			cout<<"Nevts Processed: "<<eventNr<<endl;
-
 
 		inputLevel.clear();
 		NEn=inputEn.size();
-		NPos=inputsubPos.size();
+		NPos=inputPos.size();
 		for(int i=0;i<NEn;i++){
-			if(i==0){inputLevel.push_back(-0.1);}
+			if(i==0){inputLevel.push_back(0.0);}
 			else{inputLevel.push_back(float(inputEn[i-1]+inputEn[i])/2.);}
 		}
 		inputLevel.push_back(9999.);
@@ -1560,7 +1292,6 @@ void LICH::processEvent( LCEvent * evtP )
 
 		LICH::gearPara();	
 		LICH::SamplePro( evtP );	
-				cout<<"No problem now"<<endl;
 	}
 }
 

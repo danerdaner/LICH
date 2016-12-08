@@ -17,9 +17,7 @@
 
      <global>
      <parameter name="LCIOInputFiles">
-      	INPUTLCIOPI
-     	INPUTLCIOMU
-     	INPUTLCIOE
+     	INPUTLCIO
      </parameter>
      <parameter name="GearXMLFile" value="GEARFILE"/>
      <parameter name="MaxRecordNumber" value="-1"/>
@@ -29,8 +27,11 @@
      <parameter name="RandomSeed" value="1234567890" />
      </global>
 
+
  <processor name="MyLICH" type="LICH">
  <!--Produce single particle samples for training or produce the charged PID-->
+<!--energy bins to make cut different-->
+  <parameter name="EnergyBins" type="FloatVec">-1 5 20 </parameter>
   <!--DetectorModules-->
   <parameter name="InputDetectorModules" type="StringVec">barrel1 barrel2 overlap endcap  </parameter>
   <!--The interval of energy for PID-->
@@ -39,9 +40,9 @@
   <!--Name of Inpout Reconstructed Particle Collection-->
   <parameter name="InputPFO" type="string">ArborPFOs </parameter>
   <!--The interval of angle for PID-->
-  <parameter name="InputPositions" type="FloatVec">0 0.3 0.6 0.8 1  </parameter>
+  <parameter name="InputPositions" type="FloatVec">0 0.3 0.7 0.8 1  </parameter>
   <!--Name of Output Reconstructed Particle Collection-->
-  <parameter name="OutputPFO" type="string">typedPFOs </parameter>
+  <parameter name="OutputPFO" type="string">typed1PFOs </parameter>
   <!--The generated energy point choson for training-->
   <!--Produce sample for training when 0, otherwise proceed the PID-->
   <parameter name="TrainingFlag" type="int">0 </parameter>
@@ -49,14 +50,14 @@
   <parameter name="TreeOutputFile" type="string">OUTPUTROOT </parameter>
   <!--verbosity level of this processor ("DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT")-->
   <parameter name="TrainingEn" type="string">TRAININGEN </parameter>
-  <parameter name="weightDir" type="string">WGTFILE </parameter>
+  <parameter name="weightDir" type="string">/scratchfs/higgs/yudan/SingleParticle/Reco/new_1pfo </parameter>
   <!--parameter name="Verbosity" type="string">DEBUG </parameter-->
   <!--mva value cut for electron-->
-  <parameter name="mvacut_e" type="float">0.5 </parameter>
+  <parameter name="mvacut_e" type="float">0.001 0.01 0.01</parameter>
   <!--mva value cut for electron-->
-  <parameter name="mvacut_mu" type="float">0.5 </parameter>
+  <parameter name="mvacut_mu" type="float">0.1 0.1 0.1</parameter>
   <!--mva value cut for electron-->
-  <parameter name="mvacut_pi" type="float">0.5 </parameter>
+  <parameter name="mvacut_pi" type="float">0.9 0.9 0.9 </parameter>
   <!--the weight file directory-->
 </processor>
 

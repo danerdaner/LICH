@@ -173,18 +173,22 @@ void TMVAClassification( TString myMethodList = "" )
  //                                              "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
    TMVA::Factory* factory = new TMVA::Factory("TMVAMulticlassEN",outputFile,
 		                           "!V:!Silent:Color:!DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=multiclass" );
-   	TFile* file = TFile::Open("INPUT");
-	if (!file->IsOpen()) std::cout << "could not open file" <<std::endl;
+   	TFile* filePi = TFile::Open("INPUT_pi");
+	if (!filePi->IsOpen()) std::cout << "could not open file" <<std::endl;
 
-	TTree* treePi = (TTree*)file->Get("Pion");
+	TTree* treePi = (TTree*)filePi->Get("Arbor");
 	if (treePi == 0) std::cout << "could not open tree" <<std::endl;
 
+	TFile* fileMu = TFile::Open("INPUT_mu");
+	if (!fileMu->IsOpen()) std::cout << "could not open file" <<std::endl;
 
-	TTree* treeMu = (TTree*)file->Get("Muon");
+	TTree* treeMu = (TTree*)fileMu->Get("Arbor");
 	if (treeMu == 0) std::cout << "could not open tree" <<std::endl;
 
+	TFile* fileE = TFile::Open("INPUT_e");
+	if (!fileE->IsOpen()) std::cout << "could not open file" <<std::endl;
 
-	TTree* treeE = (TTree*)file->Get("Electron");
+	TTree* treeE = (TTree*)fileE->Get("Arbor");
 	if (treeE == 0) std::cout << "could not open tree" <<std::endl;
 
 
@@ -199,19 +203,30 @@ void TMVAClassification( TString myMethodList = "" )
 //   TCut mycuts = "NTrk==1 && MCPP[2]/MCPEn<0.7"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
 
 
-   factory->AddTree( treePi, TString("Pi"), 1. ,"abs(cosTheta)>0.3&&abs(cosTheta)<0.7&&NPFO==1");
-   factory->AddTree( treeMu, TString("Mu"), 1.,"abs(cosTheta)>0.3&&abs(cosTheta)<0.7&&NPFO==1");
-   factory->AddTree( treeE, TString("E"), 1.,"abs(cosTheta)>0.3&&abs(cosTheta)<0.7&&NPFO==1");
+   factory->AddTree( treePi, TString("Pi"), 1. );
+   factory->AddTree( treeMu, TString("Mu"), 1.);
+//   factory->AddTree( treeE, TString("E"), 1., mycuts);
+   factory->AddTree( treeE, TString("E"), 1.);
 
 
 
+//   factory->AddVariable( "newFD_E","ECAL FD", "", 'F' );
+//   factory->AddVariable( "E2_E := E2/P_rec ",                "E(1R_M)", "units", 'F' );
+//   factory->AddVariable( "E0_E := E0/P_rec ",                "E(1.5 R_M)", "units", 'F' );
+//   factory->AddVariable( "E_10 := ecalEn1/P_rec ",                "E_10Lay", "units", 'F' );
+//   factory->AddVariable( "EDep",                "EDEP", "units", 'F' );
+
+ 	//factory->AddVariable("EventNr","eventNr", "units", 'I');
 	factory->AddVariable("EcalNHit","EcalNHit", "units", 'I');
 	factory->AddVariable("HcalNHit","HcalNHit", "units", 'I');
+//	factory->AddVariable("CluNHit","CluNHit", "units", 'I');
 	factory->AddVariable("NLEcal","NLEcal", "units", 'I');
 	factory->AddVariable("NLHcal","NLHcal", "units", 'I');
 	factory->AddVariable("maxDisHtoL","maxDisHtoL", "units", 'F');
+//	factory->AddVariable("minDisHtoL","minDisHtoL", "units", 'F');
 	factory->AddVariable("avDisHtoL","avDisHtoL", "units", 'F');
 	factory->AddVariable("EE := EcalEn/EClu","EcalEn", "units", 'F');
+//	factory->AddVariable("EClu","EClu", "units", 'F');
 	factory->AddVariable("graDepth","graDepth", "units", 'F');
 	factory->AddVariable("cluDepth","cluDepth", "units", 'F');
 	factory->AddVariable("minDepth","minDepth", "units", 'F');
@@ -219,6 +234,7 @@ void TMVAClassification( TString myMethodList = "" )
 	factory->AddVariable("FD_all","FD_all", "units", 'F');
 	factory->AddVariable("FD_ECAL","FD_ECAL", "units", 'F');
 	factory->AddVariable("FD_HCAL","FD_HCAL", "units", 'F');
+	//factory->AddVariable("crdis","crdis", "units", 'F');
 	factory->AddVariable("E_10 := EEClu_L10/EcalEn","EEClu_L10", "units", 'F');
 	factory->AddVariable("E_R := EEClu_R/EcalEn","EEClu_R", "units", 'F');
 	factory->AddVariable("E_r := EEClu_r/EcalEn","EEClu_r", "units", 'F');
