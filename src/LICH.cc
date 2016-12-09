@@ -16,13 +16,15 @@
 #include <IMPL/ClusterImpl.h>
 #include <IMPL/ParticleIDImpl.h>
 #include "UTIL/CellIDDecoder.h"
-#include "HelixClass.hh"
+#include "HelixClass.h"
 
 #include <string>
 #include <iostream>
 #include <cmath>
 #include <vector>
 #include <stdexcept>
+#include <unistd.h>
+
 #include <TMath.h>
 #include <TFile.h>
 #include <TTree.h>
